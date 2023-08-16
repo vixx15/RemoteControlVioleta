@@ -1,5 +1,6 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -69,13 +70,13 @@ public class KlijentGUI {
                 //BufferedImage slika = ByteToBufferedImage.convert(imageData);
                 //Icon slikaa = new ImageIcon(slika);
 
-                BufferedImage slika = ImageIO.read(new ByteArrayInputStream(imageData));
-                Icon slikaa = new ImageIcon(slika);
+                BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(imageData));
+                BufferedImage scaledImage = scaleImageToFitLabel(originalImage);
 
                 SwingUtilities.invokeLater(() -> {
-                    label.setIcon(slikaa);
-                    System.out.println("Image received and displayed!");
-                    label.revalidate(); // Refresh the label
+                    label.setText("");
+                    label.setIcon(new ImageIcon(scaledImage));
+                    label.revalidate();
                 });
             }
 
@@ -146,6 +147,25 @@ public class KlijentGUI {
 
     }
 
+    //Skalira slikuuu
+    private BufferedImage scaleImageToFitLabel(BufferedImage originalImage) {
+
+        int labelWidth = PanelSlike.getWidth();
+        int labelHeight = PanelSlike.getHeight();
+        double scaleX = (double) labelWidth / originalScreenWidth;
+        double scaleY = (double) labelHeight / originalScreenHeight;
+
+        int scaledWidth = (int) (originalImage.getWidth() * scaleX);
+        int scaledHeight = (int) (originalImage.getHeight() * scaleY);
+
+        Image scaledImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+        BufferedImage bufferedScaledImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = bufferedScaledImage.createGraphics();
+        g.drawImage(scaledImage, 0, 0, null);
+        g.dispose();
+
+        return bufferedScaledImage;
+    }
     public static void main(String[] args) {
         JFrame frame = new JFrame("KlijentGUI");
         KlijentGUI klijentGUI = new KlijentGUI();
@@ -156,4 +176,7 @@ public class KlijentGUI {
 
 
     }
+
+
 }
+
