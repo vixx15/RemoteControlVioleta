@@ -24,8 +24,8 @@ public class KlijentGUI {
 
     private String serverIpAddress;
 
-    static final int originalScreenWidth = 1920;
-    static final int originalScreenHeight = 1080;
+    static int originalScreenWidth = 1920;
+    static int originalScreenHeight = 1080;
 
     KlijentGUI() {
         ipConfirm.addActionListener(e -> {
@@ -33,7 +33,8 @@ public class KlijentGUI {
                 @Override
                 protected Void doInBackground() {
 
-                  //OVDJE TREBA DA SE NAPRAVI VALIDACIJA INPUTA DA BUDE IP I DA SE ONDA TAJ INPUT PROSLIJEDI U START CLIENT ZA KREIRANJE SOCKETA (tekst iz ipInput)
+                    //OVDJE TREBA DA SE NAPRAVI VALIDACIJA INPUTA DA BUDE IP I DA SE ONDA TAJ INPUT PROSLIJEDI U START CLIENT ZA KREIRANJE SOCKETA (tekst iz ipInput)
+
                     startClient();
                     return null;
                 }
@@ -55,10 +56,53 @@ public class KlijentGUI {
         }
 
         try {
+            DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
+            System.out.println("Created input stream!");
+            originalScreenWidth = dis.readInt();
+            originalScreenHeight = dis.readInt();
+
+            //PRIMA SLIKU PREKO THREADA U POZADINI
+            //Ako je ne prima tako onda se zaglavi u toj petlji i ne desava se nsita drugo, ne dodaje se npr listener za klik
+            SwingWorker<Void, BufferedImage> worker = new SwingWorker<Void, BufferedImage>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    while (true) {
+                        System.out.println("Waiting for image from server...");
+                        int imageDataLength = dis.readInt();
+                        byte[] imageData = new byte[imageDataLength];
+                        dis.readFully(imageData);
+
+                        BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(imageData));
+                        BufferedImage scaledImage = scaleImageToFitLabel(originalImage);
+
+                        publish(scaledImage);
+                    }
+                }
+
+                @Override
+                protected void process(java.util.List<BufferedImage> chunks) {
+                    // Update UI with the latest image on the EDT
+                    BufferedImage latestImage = chunks.get(chunks.size() - 1);
+                    label.setText("");
+                    label.setIcon(new ImageIcon(latestImage));
+                    label.revalidate();
+                }
+            };
+
+            worker.execute(); // Start the background image receiving task
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+            /*try {
 
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
             System.out.println("Created input stream!");
 
+
+            originalScreenWidth = dis.readInt();
+            originalScreenHeight = dis.readInt();
 
             while (true) {
                 System.out.println("Waiting for image from server...");
@@ -91,9 +135,7 @@ public class KlijentGUI {
                     e.printStackTrace();
                 }
             }
-        }
-
-
+        }*/
 
 
         //slanje klika
@@ -101,13 +143,27 @@ public class KlijentGUI {
         label.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                System.out.println("Uhvacen klik");
                 try {
                     // Izračunavanje razmere između originalne i trenutne veličine slike
                     int displayedImageWidth = label.getWidth();
                     int displayedImageHeight = label.getHeight();
 
-                    double scaleX = (double) originalScreenWidth / displayedImageWidth;
-                    double scaleY = (double) originalScreenHeight / displayedImageHeight;
+                    double originalAspectRatio = (double) originalScreenWidth / originalScreenHeight;
+                    double labelAspectRatio = (double) displayedImageWidth / displayedImageHeight;
+
+                    double scaleX;
+                    double scaleY;
+
+                    if (originalAspectRatio > labelAspectRatio) {
+                        scaleX = (double) originalScreenWidth / displayedImageWidth;
+                        scaleY = scaleX;
+                    } else {
+                        scaleY = (double) originalScreenHeight / displayedImageHeight;
+                        scaleX = scaleY;
+                    }
+                    /*double scaleX = (double) originalScreenWidth / displayedImageWidth;
+                    double scaleY = (double) originalScreenHeight / displayedImageHeight;*/
 
                     // Izračunavanje stvarne pozicije klika
                     int actualX = (int) (e.getX() * scaleX);
@@ -119,6 +175,8 @@ public class KlijentGUI {
                     finalDos.writeInt(actualX);
                     finalDos.writeInt(actualY);
                     finalDos.writeInt(e.getButton());
+                    System.out.println("Posalan klik");
+
                     finalDos.flush();
 
                 } catch (IOException ioException) {
@@ -144,6 +202,8 @@ public class KlijentGUI {
 
             }
         };
+        label.addKeyListener(keyAdapter);
+
 
     }
 
@@ -152,9 +212,24 @@ public class KlijentGUI {
 
         int labelWidth = PanelSlike.getWidth();
         int labelHeight = PanelSlike.getHeight();
-        double scaleX = (double) labelWidth / originalScreenWidth;
-        double scaleY = (double) labelHeight / originalScreenHeight;
 
+        double originalAspectRatio = (double) originalScreenWidth / originalScreenHeight;
+        double labelAspectRatio = (double) labelWidth / labelHeight;
+
+        double scaleX;
+        double scaleY;
+
+        if (originalAspectRatio > labelAspectRatio) {
+            scaleX = (double) labelWidth / originalScreenWidth;
+            scaleY = scaleX;
+        } else {
+            scaleY = (double) labelHeight / originalScreenHeight;
+            scaleX = scaleY;
+        }
+
+        /*double scaleX = (double) labelWidth / originalScreenWidth;
+        double scaleY = (double) labelHeight / originalScreenHeight;
+        */
         int scaledWidth = (int) (originalImage.getWidth() * scaleX);
         int scaledHeight = (int) (originalImage.getHeight() * scaleY);
 
@@ -166,9 +241,12 @@ public class KlijentGUI {
 
         return bufferedScaledImage;
     }
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("KlijentGUI");
         KlijentGUI klijentGUI = new KlijentGUI();
+        Dimension minimumSize = new Dimension(1120, 630); // Proporcije 16:9
+        frame.setMinimumSize(minimumSize);
         frame.setContentPane(klijentGUI.panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

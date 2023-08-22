@@ -75,6 +75,7 @@ public class GUIUredjaj1 extends JFrame implements ActionListener {
                                     int x = dis.readInt();
                                     int y = dis.readInt();
                                     int buttonType = dis.readInt();
+                                    System.out.println("primljen klik");
                                     simulateMouseClick(x, y, buttonType);
                                 }
                                 //ako se radi o tastaturi
@@ -92,6 +93,15 @@ public class GUIUredjaj1 extends JFrame implements ActionListener {
                         }
 
                     }).start();
+
+                    //Slanje dimenzija servera
+                    Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+                    int width = size.width;
+                    int height = size.height;
+
+                    dos.writeInt(width);
+                    dos.writeInt(height);
+                    dos.flush();
 
                     // Slanje slike klijentu
                     while (videoIde) {
@@ -148,6 +158,8 @@ public class GUIUredjaj1 extends JFrame implements ActionListener {
                     buttonDownMask = InputEvent.BUTTON3_DOWN_MASK;
                     break;
             }
+
+            System.out.println("Simuliran klik");
 
             robot.mousePress(buttonDownMask);
             robot.mouseRelease(buttonDownMask);
