@@ -10,16 +10,15 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class KlijentGUI {
     private JPanel panel1;
-    private JLabel ipLabel;
-    private JTextField ipInput;
+    private JPanel gore;
+    private JLabel adresa;
     private JButton ipConfirm;
-    private JLabel ipInfo;
     private JPanel PanelSlike;
-    private JPanel PanelDugmica;
     private JLabel label;
 
     private String serverIpAddress;
@@ -28,6 +27,15 @@ public class KlijentGUI {
     static int originalScreenHeight = 1080;
 
     KlijentGUI() {
+        try {
+            InetAddress localhost = InetAddress.getLocalHost();
+            String ipAddress = localhost.getHostAddress();
+
+            adresa.setText("Vasa adresa: " + ipAddress);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ipConfirm.addActionListener(e -> {
             SwingWorker<Void, Void> worker = new SwingWorker<>() {
                 @Override
