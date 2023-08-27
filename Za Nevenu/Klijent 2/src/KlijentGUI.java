@@ -1,8 +1,7 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.MaskFormatter;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -11,11 +10,9 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalTime;
-import java.util.regex.Pattern;
+import java.util.StringTokenizer;
 
 public class KlijentGUI {
     private JPanel panel1;
@@ -37,15 +34,6 @@ public class KlijentGUI {
     LocalTime vremeOdZadnjeSlike;
 
     KlijentGUI() {
-
-        try {
-            MaskFormatter maskFormatter = new MaskFormatter("#?##.###.###.###");
-            adresaServera.setFormatterFactory(new DefaultFormatterFactory(new IPAddressFormatter()));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-
 
         ipConfirm.addActionListener(e -> {
             SwingWorker<Void, Void> worker = new SwingWorker<>() {
@@ -310,7 +298,5 @@ public class KlijentGUI {
         JOptionPane.showMessageDialog(null,"Prekinuli ste sesiju.");
         pokreniInterfejs();
     }
-
-
 }
 
