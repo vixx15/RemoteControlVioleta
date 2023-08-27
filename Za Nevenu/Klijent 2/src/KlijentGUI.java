@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.time.LocalTime;
 
 public class KlijentGUI {
     private JPanel panel1;
@@ -25,10 +26,9 @@ public class KlijentGUI {
 
     Socket clientSocket = null;
     boolean prenosAktivan = false;
-
-    long lastReadTime = 0;
-
     static JFrame frame;
+
+    LocalTime vremeOdZadnjeSlike;
 
     KlijentGUI() {
 
@@ -42,17 +42,10 @@ public class KlijentGUI {
                         prenosAktivan = true;
                         ipConfirm.setText("Prekini prenos");
                         label.setText(null);
-                        try {
-                            clientSocket = new Socket("localhost", 12345);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-
                         startClient();
                     }else {
-                        frame.dispose();
-                        JOptionPane.showMessageDialog(frame,"Prekinuli ste sesiju.");
-                        pokreniInterfejs();
+
+                        resetuj();
                     }
 
                     return null;
@@ -64,8 +57,27 @@ public class KlijentGUI {
 
     private void startClient() {
 
+        vremeOdZadnjeSlike = LocalTime.now();
+/*
+        //POKUSAJ DA VIDIMO KADA JE SERVER UGASEN... ALI NE RADI...
+        new Thread(() -> {
+            while (true){
+                if((vremeOdZadnjeSlike.plusSeconds(5)).isBefore(LocalTime.now())){
+                    resetuj();
+                    break;
+                }
+            }
+        }).start();*/
+
+        try {
+            clientSocket = new Socket("localhost", 12345);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
         DataOutputStream dos = null;
         try {
+
              dos = new DataOutputStream(clientSocket.getOutputStream());
             System.out.println("Created output stream!");
 
@@ -81,12 +93,14 @@ public class KlijentGUI {
             SwingWorker<Void, BufferedImage> worker = new SwingWorker<Void, BufferedImage>() {
                 @Override
                 protected Void doInBackground() throws Exception {
+
                     while (true) {
 
                         System.out.println("Waiting for image from server...");
                         int imageDataLength = dis.readInt();
                         byte[] imageData = new byte[imageDataLength];
                         dis.readFully(imageData);
+                        vremeOdZadnjeSlike = LocalTime.now();
 
                         BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(imageData));
                         BufferedImage scaledImage = scaleImageToFitLabel(originalImage);
@@ -102,7 +116,6 @@ public class KlijentGUI {
                     label.setText("");
                     label.setIcon(new ImageIcon(latestImage));
                     label.revalidate();
-                    azurirajVreme();
                 }
             };
 
@@ -219,8 +232,6 @@ public class KlijentGUI {
             }
         };
         label.addKeyListener(keyAdapter);
-
-
     }
 
     //Skalira slikuuu
@@ -260,8 +271,6 @@ public class KlijentGUI {
 
     public static void main(String[] args) {
         pokreniInterfejs();
-
-
     }
 
     public static void pokreniInterfejs(){
@@ -275,8 +284,16 @@ public class KlijentGUI {
         frame.setVisible(true);
     }
 
-    public void azurirajVreme(){
-        lastReadTime = System.currentTimeMillis();
+    public void resetuj(){
+
+        try {
+            clientSocket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        frame.dispose();
+        JOptionPane.showMessageDialog(null,"Prekinuli ste sesiju.");
+        pokreniInterfejs();
     }
 
 }
