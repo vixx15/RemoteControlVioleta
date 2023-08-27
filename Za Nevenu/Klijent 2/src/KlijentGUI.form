@@ -47,7 +47,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="f575f" class="javax.swing.JFormattedTextField" binding="formattedTextField1" default-binding="true">
+              <component id="f575f" class="javax.swing.JFormattedTextField" binding="adresaServera">
                 <constraints border-constraint="Center"/>
                 <properties/>
               </component>
