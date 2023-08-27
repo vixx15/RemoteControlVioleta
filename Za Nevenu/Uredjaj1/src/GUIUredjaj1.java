@@ -136,6 +136,7 @@ public class GUIUredjaj1 extends JFrame implements ActionListener {
         }
         // Za prekidanje prenosa
         if (e.getSource() == prekini) {
+
             videoIde = false;
         }
     }
@@ -194,4 +195,5 @@ public class GUIUredjaj1 extends JFrame implements ActionListener {
         }
         return null;
     }
+
 }

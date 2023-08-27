@@ -6,10 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -20,30 +17,44 @@ public class KlijentGUI {
     private JButton ipConfirm;
     private JPanel PanelSlike;
     private JLabel label;
-
-    private String serverIpAddress;
+    private JFormattedTextField formattedTextField1;
+    private JLabel labelaZaTxt;
 
     static int originalScreenWidth = 1920;
     static int originalScreenHeight = 1080;
 
+    Socket clientSocket = null;
+    boolean prenosAktivan = false;
+
+    long lastReadTime = 0;
+
+    static JFrame frame;
+
     KlijentGUI() {
-        try {
-            InetAddress localhost = InetAddress.getLocalHost();
-            String ipAddress = localhost.getHostAddress();
 
-            adresa.setText("Vasa adresa: " + ipAddress);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         ipConfirm.addActionListener(e -> {
             SwingWorker<Void, Void> worker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() {
 
-                    //OVDJE TREBA DA SE NAPRAVI VALIDACIJA INPUTA DA BUDE IP I DA SE ONDA TAJ INPUT PROSLIJEDI U START CLIENT ZA KREIRANJE SOCKETA (tekst iz ipInput)
+                    if(!prenosAktivan){
+                        prenosAktivan = true;
+                        ipConfirm.setText("Prekini prenos");
+                        label.setText(null);
+                        try {
+                            clientSocket = new Socket("localhost", 12345);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
 
-                    startClient();
+                        startClient();
+                    }else {
+                        frame.dispose();
+                        JOptionPane.showMessageDialog(frame,"Prekinuli ste sesiju.");
+                        pokreniInterfejs();
+                    }
+
                     return null;
                 }
             };
@@ -52,22 +63,18 @@ public class KlijentGUI {
     }
 
     private void startClient() {
-        Socket clientSocket = null;
+
         DataOutputStream dos = null;
-
         try {
-            clientSocket = new Socket("localhost", 12345);
-            dos = new DataOutputStream(clientSocket.getOutputStream());
+             dos = new DataOutputStream(clientSocket.getOutputStream());
             System.out.println("Created output stream!");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        try {
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
             System.out.println("Created input stream!");
+
             originalScreenWidth = dis.readInt();
             originalScreenHeight = dis.readInt();
+
 
             //PRIMA SLIKU PREKO THREADA U POZADINI
             //Ako je ne prima tako onda se zaglavi u toj petlji i ne desava se nsita drugo, ne dodaje se npr listener za klik
@@ -75,6 +82,7 @@ public class KlijentGUI {
                 @Override
                 protected Void doInBackground() throws Exception {
                     while (true) {
+
                         System.out.println("Waiting for image from server...");
                         int imageDataLength = dis.readInt();
                         byte[] imageData = new byte[imageDataLength];
@@ -94,11 +102,11 @@ public class KlijentGUI {
                     label.setText("");
                     label.setIcon(new ImageIcon(latestImage));
                     label.revalidate();
+                    azurirajVreme();
                 }
             };
 
             worker.execute(); // Start the background image receiving task
-
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -251,7 +259,13 @@ public class KlijentGUI {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("KlijentGUI");
+        pokreniInterfejs();
+
+
+    }
+
+    public static void pokreniInterfejs(){
+        frame = new JFrame("KlijentGUI");
         KlijentGUI klijentGUI = new KlijentGUI();
         Dimension minimumSize = new Dimension(1120, 630); // Proporcije 16:9
         frame.setMinimumSize(minimumSize);
@@ -259,10 +273,11 @@ public class KlijentGUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-
-
     }
 
+    public void azurirajVreme(){
+        lastReadTime = System.currentTimeMillis();
+    }
 
 }
 
