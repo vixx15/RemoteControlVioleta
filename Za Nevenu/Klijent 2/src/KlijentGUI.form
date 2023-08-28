@@ -11,66 +11,99 @@
     </properties>
     <border type="none"/>
     <children>
-      <grid id="db9d1" binding="gore" layout-manager="GridLayoutManager" row-count="5" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="db9d1" binding="gore" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints border-constraint="North"/>
-        <properties/>
+        <properties>
+          <background color="-15724511"/>
+          <foreground color="-855041"/>
+        </properties>
         <border type="none"/>
         <children>
           <vspacer id="bc73f">
             <constraints>
-              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                <minimum-size width="5" height="5"/>
+                <preferred-size width="20" height="20"/>
+                <maximum-size width="25" height="25"/>
+              </grid>
             </constraints>
           </vspacer>
           <component id="a6bdf" class="javax.swing.JButton" binding="ipConfirm">
             <constraints>
-              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <background color="-1"/>
+              <font name="Century Gothic" size="16" style="1"/>
               <text value="Povezi"/>
             </properties>
           </component>
           <hspacer id="5d190">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
           <hspacer id="d433b">
             <constraints>
-              <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
           <grid id="22ac6" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
               <component id="f575f" class="javax.swing.JFormattedTextField" binding="adresaServera">
                 <constraints border-constraint="Center"/>
-                <properties/>
+                <properties>
+                  <background color="-15000279"/>
+                  <caretColor color="-855041"/>
+                  <font name="Century Gothic" size="14" style="0"/>
+                  <foreground color="-855041"/>
+                </properties>
               </component>
             </children>
           </grid>
           <component id="a47c3" class="javax.swing.JLabel" binding="labelaZaTxt">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <font name="Century Gothic" size="20" style="1"/>
+              <foreground color="-1"/>
               <text value="Unesite adresu host-a:"/>
             </properties>
           </component>
           <vspacer id="ce833">
             <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                <minimum-size width="5" height="5"/>
+                <preferred-size width="10" height="10"/>
+                <maximum-size width="15" height="15"/>
+              </grid>
+            </constraints>
+          </vspacer>
+          <vspacer id="1bb18">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                <minimum-size width="5" height="5"/>
+                <preferred-size width="20" height="20"/>
+                <maximum-size width="25" height="25"/>
+              </grid>
             </constraints>
           </vspacer>
         </children>
       </grid>
       <grid id="c3f38" binding="PanelSlike" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
         <constraints border-constraint="Center"/>
-        <properties/>
+        <properties>
+          <autoscrolls value="false"/>
+          <background color="-15132114"/>
+          <enabled value="true"/>
+        </properties>
         <border type="none"/>
         <children>
           <component id="fd23f" class="javax.swing.JLabel" binding="label">
