@@ -243,6 +243,7 @@ public class KlijentGUI {
             }
         });
 
+        label.requestFocusInWindow();
         //slanje unosa sa tastature
         KeyAdapter keyAdapter = new KeyAdapter() {
             @Override
@@ -257,7 +258,6 @@ public class KlijentGUI {
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-
             }
         };
         label.addKeyListener(keyAdapter);
