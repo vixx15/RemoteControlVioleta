@@ -13,6 +13,8 @@ import java.net.Socket;
 import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class KlijentGUI {
     private JPanel panel1;
@@ -33,6 +35,22 @@ public class KlijentGUI {
 
     LocalTime vremeOdZadnjeSlike;
 
+    public boolean daliJeIPAdresa(String ip){
+        String zeroTo255 = "(\\d{1,2}|(0|1)\\" + "d{2}|2[0-4]\\d|25[0-5])";
+        String regex= zeroTo255 + "\\."+ zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255;
+        Pattern p = Pattern.compile(regex);
+        if (ip == null)
+        {
+            return false;
+        }
+        if( ip.equals("localhost")){
+            return true;
+        }
+        Matcher m = p.matcher(ip);
+        return m.matches();
+    }
+
+
     KlijentGUI() {
 
         ipConfirm.addActionListener(e -> {
@@ -42,10 +60,16 @@ public class KlijentGUI {
 
                         if(!prenosAktivan){
 
-                            prenosAktivan = true;
-                            ipConfirm.setText("Prekini prenos");
-                            label.setText(null);
-                            startClient();
+                            if(daliJeIPAdresa(adresaServera.getText())){
+                                prenosAktivan = true;
+                                ipConfirm.setText("Prekini prenos");
+                                label.setText(null);
+                                startClient();
+                            }else {
+                                JOptionPane.showMessageDialog(null, "IP adresa nije ispravno uneta.");
+                            }
+
+
                         }else {
 
                             resetuj();
@@ -73,7 +97,7 @@ public class KlijentGUI {
         }).start();*/
 
         try {
-            clientSocket = new Socket("localhost", 12345);
+            clientSocket = new Socket(adresaServera.getText(), 12345);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
