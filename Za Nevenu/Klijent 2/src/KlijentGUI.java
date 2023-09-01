@@ -59,7 +59,6 @@ public class KlijentGUI {
                 protected Void doInBackground() {
 
                         if(!prenosAktivan){
-
                             if(daliJeIPAdresa(adresaServera.getText())){
                                 prenosAktivan = true;
                                 ipConfirm.setText("Prekini prenos");
@@ -72,7 +71,7 @@ public class KlijentGUI {
 
                         }else {
 
-                            resetuj();
+                            resetuj(1);
                         }
 
                     return null;
@@ -125,6 +124,9 @@ public class KlijentGUI {
 
                         System.out.println("Waiting for image from server...");
                         int imageDataLength = dis.readInt();
+                        if(imageDataLength == 123){
+                            resetuj(2);
+                        }
                         byte[] imageData = new byte[imageDataLength];
                         dis.readFully(imageData);
                         vremeOdZadnjeSlike = LocalTime.now();
@@ -311,15 +313,21 @@ public class KlijentGUI {
         frame.setVisible(true);
     }
 
-    public void resetuj(){
-
+    public void resetuj(int broj){
         try {
             clientSocket.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         frame.dispose();
-        JOptionPane.showMessageDialog(null,"Prekinuli ste sesiju.");
+        switch (broj){
+            case 1:
+                JOptionPane.showMessageDialog(null,"Prekinuli ste sesiju.");
+                break;
+            case 2:
+                JOptionPane.showMessageDialog(null,"Server je ugasen.");
+                break;
+        }
         pokreniInterfejs();
     }
 }

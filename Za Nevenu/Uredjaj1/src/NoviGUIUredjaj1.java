@@ -16,13 +16,10 @@ public class NoviGUIUredjaj1 {
     private JPanel panel1;
     private JLabel adresa;
     private JButton dugme;
-
     static JFrame frame;
-
     ServerSocket serverSocket;
-
     boolean videoIde = false;
-
+    Socket klijentSocket;
 
     NoviGUIUredjaj1(){
 
@@ -52,7 +49,6 @@ public class NoviGUIUredjaj1 {
             };
             worker.execute();
         });
-
     }
 
     private void pokreniUredjaj(){
@@ -65,7 +61,7 @@ public class NoviGUIUredjaj1 {
             try {
                 dugme.setEnabled(false);
                 dugme.setText("Cekam da se poveze klijent.");
-                Socket klijentSocket = serverSocket.accept();
+                klijentSocket = serverSocket.accept();
                 dugme.setEnabled(true);
                 dugme.setText("Prekini prenos.");
                 DataOutputStream dos = new DataOutputStream(klijentSocket.getOutputStream());
@@ -214,26 +210,34 @@ public class NoviGUIUredjaj1 {
     }
 
     public void resetuj(int broj){
-        videoIde=false;
-        frame.dispose();
+
         switch (broj){
             case 1:
                 JOptionPane.showMessageDialog(null,"Klijent se odvezao.");
+                try {
+                    serverSocket.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 break;
             case 2:
                 JOptionPane.showMessageDialog(null,"Prekinuli ste prenos.");
+                try {
+                    DataOutputStream dos = new DataOutputStream(klijentSocket.getOutputStream());
+                    dos.writeInt(123);
+                    dos.flush();
+                    dos.close();
+                    klijentSocket.close();
+                    serverSocket.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 break;
         }
 
-        try {
-            serverSocket.close();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+
+        videoIde=false;
+        frame.dispose();
         pokreniInterfejs();
     }
-
-
-
-
 }
